@@ -20,16 +20,15 @@ public class Robot extends IterativeRobot {
     final String customAuto = "My Auto";
     SmartDashboard dash = new SmartDashboard();
     
+    //Definition of classes
     Victor Vibrator;
     Joystick Methamatics;
     
+    //the speed variable
     double speed = 0;
     
-    boolean scale = true;
-    boolean pressed = false;
-    
-    double highded = 0.25;
-    double lowded = -0.25;
+    //change these to change the high and low deadzones
+    double deadzone = .25;
     
     String autoSelected;
     SendableChooser chooser;
@@ -39,8 +38,10 @@ public class Robot extends IterativeRobot {
      * used for any initialization code.
      */
     public void robotInit() {
-    	Vibrator = new Victor(6);
-    	Methamatics = new Joystick(0);
+    	Vibrator = new Victor(6);       //victor set to port 6
+    	Methamatics = new Joystick(0);  // first joystick
+    	
+    	
         chooser = new SendableChooser();
         chooser.addDefault("Default Auto", defaultAuto);
         chooser.addObject("My Auto", customAuto);
@@ -84,16 +85,18 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
-    	//speed+= 0.001;
-    	//speed = 1;
-        //System.out.println();
     	
-    	speed = Methamatics.getRawAxis(1);
-    	if(speed <= highded && speed >= lowded){
+    	speed = Methamatics.getRawAxis(1); // set the speed variable to the joystick axis Y left stick
+    	
+    	//if the input is in the deadzone, the register input as 0
+    	if(speed <= deadzone && speed >= -deadzone){
     		speed = 0;
     	}
+    	
+    	//scale the input field to a smaller scale to accomodate for deadzone
     	speed = speed * (((Math.abs(speed))-0.25)/0.75);
-        Vibrator.set(speed);
+    	
+        Vibrator.set(speed); //apply final speed to the moter
     }
     
     /**
@@ -102,12 +105,5 @@ public class Robot extends IterativeRobot {
     public void testPeriodic() {
     
     }
-    
-    public void ToggleMode(){
-    	if(!scale){
-    		scale = true;
-    	}else if(scale){
-    		scale = false;
-    	}
-    }
+
 }
