@@ -15,17 +15,27 @@ import edu.wpi.first.wpilibj.Joystick;
  * creating this project, you must also update the manifest file in the resource
  * directory.
  */
+
+/*
+ * IMPORTANT: left side speed needs to be positive, right side speed needs to be negative
+ */
+
 public class Robot extends IterativeRobot {
     final String defaultAuto = "Default";
     final String customAuto = "My Auto";
     SmartDashboard dash = new SmartDashboard();
     
     //Definition of classes
-    Victor Vibrator;
+    Victor FL;
+    Victor BL;
+    Victor BR;
+    Victor FR;
+    
     Joystick Methamatics;
     
     //the speed variable
-    double speed = 0;
+    double speed;
+    double turn;
     
     //change these to change the high and low deadzones
     double deadzone = .25;
@@ -38,7 +48,11 @@ public class Robot extends IterativeRobot {
      * used for any initialization code.
      */
     public void robotInit() {
-    	Vibrator = new Victor(6);       //victor set to port 6
+    	FL = new Victor(0);       //victor set to port 6
+    	BL = new Victor(1);
+    	FR = new Victor(2);
+    	BR = new Victor(3);
+    	
     	Methamatics = new Joystick(0);  // first joystick
     	
     	
@@ -85,18 +99,9 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
+    	Drive();  
     	
-    	speed = Methamatics.getRawAxis(1); // set the speed variable to the joystick axis Y left stick
-    	
-    	//if the input is in the deadzone, the register input as 0
-    	if(speed <= deadzone && speed >= -deadzone){
-    		speed = 0;
-    	}
-    	
-    	//scale the input field to a smaller scale to accomodate for deadzone
-    	speed = speed * (((Math.abs(speed))-0.25)/0.75);
-    	
-        Vibrator.set(speed); //apply final speed to the moter
+    	//  ( . Y . Y . ) hi
     }
     
     /**
@@ -104,6 +109,32 @@ public class Robot extends IterativeRobot {
      */
     public void testPeriodic() {
     
+    }
+    
+    public void Drive() {
+    	speed = Methamatics.getRawAxis(1);
+    	
+    	if (speed <=deadzone && speed >= -deadzone) {
+    		speed = 0;
+    	}
+    	
+    	speed = speed * (((Math.abs(speed))-0.25)/0.75);
+    	
+    	FL.set(speed);
+    	BL.set(speed);
+    	FR.set(-speed);
+    	BR.set(-speed);
+    	
+    	turn = Methamatics.getRawAxis(4);
+    	
+    	if (turn < 0) {
+    		FL.set(FL.getSpeed()- Math.abs(turn));
+    		BL.set(BL.getSpeed()- Math.abs(turn));
+    	} else if (turn >= 0) {
+    		FR.set(FR.getSpeed()- turn);
+    		BR.set(BR.getSpeed()-turn);
+    	}
+    	
     }
 
 }
